@@ -1,37 +1,40 @@
 using System;
 using System.Collections.Generic;
-using UniRx;
 using UnityEngine;
 
+//Класс инвентаря, принадлежит игроку. 
 public class Inventory : MonoBehaviour
 {
     public event Action<ItemScriptableObject> AddInventoryItem;
-    public event Action<ItemScriptableObject,int> ChangeInventoryItemAmmount;
+    public event Action<int,int> ChangeInventoryItemAmmount;
+    public event Action<int> RemoveInventoryItem;
 
     [SerializeField] private List<Items> _items = new List<Items>();
 
-    private CompositeDisposable _disposables = new CompositeDisposable();
-    public ReactiveCommand<int> ComandUseItem = new ReactiveCommand<int>();
-    public ReactiveCommand<int> ComandRemoveItem = new ReactiveCommand<int>();
+    /*    private CompositeDisposable _disposables = new CompositeDisposable();
+        public ReactiveCommand<int> ComandUseItem = new ReactiveCommand<int>();
+        public ReactiveCommand<int> ComandRemoveItem = new ReactiveCommand<int>();*/
 
-    private void Start()
-    {
-        ComandUseItem.Subscribe(item =>
+    /*    private void Start()
         {
-            UseItem(item);
-        }).AddTo(_disposables);
+            ComandUseItem.Subscribe(item =>
+            {
+                UseItem(item);
+            }).AddTo(_disposables);
 
-        ComandRemoveItem.Subscribe(item => 
+            ComandRemoveItem.Subscribe(item => 
+            {
+                RemoveItem(item);
+            }).AddTo(_disposables);
+        }*/
+
+    /*    private void OnDestroy()
         {
-            RemoveItem(item);
-        }).AddTo(_disposables);
-    }
+            _disposables.Clear();
+        }*/
 
-    private void OnDestroy()
-    {
-        _disposables.Clear();
-    }
-
+    //При получении новой вещи, проверка есть ли такая уже вещь в инвентаре, если да, то суммируется. Если нет, то создается новый класс вещи и
+    //добавляется в список.
     public void AddItem(ItemScriptableObject itemScriptableObject)
     {
         bool isNew = false;
@@ -41,8 +44,7 @@ public class Inventory : MonoBehaviour
             if (itemScriptableObject.IdItem == itemsdf.IdItem)
             {
                 itemsdf.SetAmmount(itemScriptableObject.Ammount);
-                Debug.Log(itemsdf.Amount);
-                ChangeInventoryItemAmmount?.Invoke(itemScriptableObject,itemsdf.Amount);
+                ChangeInventoryItemAmmount?.Invoke(itemScriptableObject.IdItem, itemsdf.Amount);
                 isNew = true;
                 continue;
             }
@@ -55,14 +57,13 @@ public class Inventory : MonoBehaviour
         }       
     }
 
-
+    //Создание нового класса item по типу подобранной item
     private Items CreateItem(ItemScriptableObject itemScriptableObject)
     {
         switch (itemScriptableObject.TypeItem)
         {
             case ItemType.Herb:
-                Debug.Log("Create herb");
-                ItemsHerb herb = new ItemsHerb(itemScriptableObject);
+                ItemsHerb herb = new ItemsHerb(itemScriptableObject as ItemScriptableObjectHerb);
                 return herb;
         }
 
@@ -70,7 +71,10 @@ public class Inventory : MonoBehaviour
         return null;
     }
 
-    public bool UseItem(int id)
+
+    //Использование item с проверкой. Если есть такой item  то уменьшаем ammount, если ammount после использования 0,
+    //вызываем евент и удаляем предмет из UI и инвентаря 
+    public void UseItem(int id)
     {
         foreach (var it in _items)
         {
@@ -78,17 +82,28 @@ public class Inventory : MonoBehaviour
             {
                 if (it is IUseItem)
                 {
+                    
                     var itemUse = it as IUseItem;
                     itemUse.Use();
-                    return true;
+
+                    if (it.Amount > 0)
+                    {
+                        ChangeInventoryItemAmmount?.Invoke(it.IdItem, it.Amount);
+                    }
+
+                    else
+                    {
+                        RemoveInventoryItem?.Invoke(id);
+                        RemoveItem(id);
+                        break;
+                    }
                 }
                     
             }
         }
-
-        return false;
     }
 
+    //Удаляем item и вызваем евент. 
     public bool RemoveItem(int id)
     {
         for (int i = 0; i < _items.Count; i++)
@@ -96,7 +111,7 @@ public class Inventory : MonoBehaviour
             if (_items[i].IdItem == id)
             {
                 _items.Remove(_items[i]);
-                Debug.Log("Удалил:");
+                RemoveInventoryItem?.Invoke(id);
                 return true;
             }
         }

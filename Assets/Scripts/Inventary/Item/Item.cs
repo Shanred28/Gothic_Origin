@@ -1,5 +1,6 @@
 using UnityEngine;
 
+//Класс всех интерактивных вещей, базовый.
 public class Item : MonoBehaviour, IPickUp
 {
     [SerializeField] private ItemScriptableObject ItemSO;

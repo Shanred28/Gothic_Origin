@@ -41,19 +41,21 @@ public class InventoryManager : MonoBehaviour
     {
         _inventory.AddInventoryItem += AddCell;
         _inventory.ChangeInventoryItemAmmount += OnChangeInventoryItemAmmount;
+        _inventory.RemoveInventoryItem += OnRemoveInventoryItem;
     }
 
     private void OnDestroy()
     {
         _inventory.AddInventoryItem -= AddCell;
         _inventory.ChangeInventoryItemAmmount -= OnChangeInventoryItemAmmount;
+        _inventory.RemoveInventoryItem -= OnRemoveInventoryItem;
     }
 
-    private void OnChangeInventoryItemAmmount(ItemScriptableObject itemSO,int obj)
+    private void OnChangeInventoryItemAmmount(int itemId,int obj)
     {
-        if (SearchItem(itemSO) == true)
+        if (SearchItem(itemId) == true)
         {
-            ChangeAmmountCells(itemSO, obj);
+            ChangeAmmountCells(itemId, obj);
         }
     }
 
@@ -68,35 +70,57 @@ public class InventoryManager : MonoBehaviour
     private void AddItemCellInInventory(ItemScriptableObject item)
     {
         UI_InventoryCell cell = Instantiate(inventoryCellPref, _itemContent);
-        cell.SetInfo(item.Name, item.IdItem, item.IconeItem, item.Ammount, item.CountGold, _perentInfoPanel);
+        cell.SetInfo(item.Name, item.IdItem, item.IconeItem, item.Ammount, item.CountGold, _perentInfoPanel, item.ItemInfo);
         _inventoryCells.Add(cell);
     }
-
-    private bool SearchItem(ItemScriptableObject itemSO)
+ 
+    private bool SearchItem(int itemId)
     {
         foreach (ItemInInventory item in _itemsInInventory)
         {
-            if (itemSO.IdItem == item.IdItem)
+            if (itemId == item.IdItem)
             {
                 return true;
             }
         }
         return false;
     }
-    private void ChangeAmmountCells(ItemScriptableObject itemSO, int ammount)
+
+    private void ChangeAmmountCells(int itemId, int ammount)
     {
         foreach (var cell in _itemsInInventory)
         {
-            if (itemSO.IdItem == cell.IdItem)
+            if (itemId == cell.IdItem)
             {
                 cell.SetAmmount(ammount);
             }
         }
         foreach (var cell in _inventoryCells)
         {
-            if (itemSO.IdItem == cell.IdItem)
+            if (itemId == cell.IdItem)
             {
                 cell.SetAmmount(ammount);
+            }
+        }
+    }
+
+    //Удаление из списков. Дестрой _inventoryCells. Последовательность циклов важна.
+    private void OnRemoveInventoryItem(int itemId)
+    {
+        for (int i = 0; i < _itemsInInventory.Count; i++)
+        {
+            if (itemId == _itemsInInventory[i].IdItem)
+            {
+                _itemsInInventory.Remove(_itemsInInventory[i]);
+            }
+        }
+
+        for (int i = 0; i < _inventoryCells.Count; i++)
+        {
+            if (itemId == _inventoryCells[i].IdItem)
+            {
+                Destroy(_inventoryCells[i].gameObject);
+                _inventoryCells.Remove(_inventoryCells[i]);
             }
         }
     }

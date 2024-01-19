@@ -19,4 +19,5 @@ public class ItemScriptableObject : ScriptableObject
     public int CountGold;
     public GameObject ModelPref;
     public Sprite IconeItem;
+    public string ItemInfo;
 }

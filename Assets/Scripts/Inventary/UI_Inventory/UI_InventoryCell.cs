@@ -1,12 +1,11 @@
 using TMPro;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UI_InventoryCell : MonoBehaviour
 {
     private const string NAMEITEM = "Название: ";
-    private const string AMMOUNTITEM = "Колличество: ";
+    private const string AMMOUNTITEM = "Количество: ";
     private const string COSTGOLDITEM = "Стоимость: ";
 
     [SerializeField] private TMP_Text _nameItem;
@@ -25,17 +24,6 @@ public class UI_InventoryCell : MonoBehaviour
     private Transform _parentInfoPanel;
     private UI_PanelInteractItemInv panelInteractItemInv;
 
-    private CompositeDisposable _disposables = new CompositeDisposable();
-    public ReactiveCommand<int> UseItem = new ReactiveCommand<int>();
-
-    private void Start()
-    {
-        UseItem.Subscribe(item =>
-        {
-
-        }).AddTo(_disposables);
-    }
-
     private void OnEnable()
     {
         if (_panelInfo != null)
@@ -44,15 +32,15 @@ public class UI_InventoryCell : MonoBehaviour
         }      
     }
 
-    public void SetInfo(string name, int id, Sprite image, int amount, int costGold, Transform parent)
+    public void SetInfo(string name, int id, Sprite image, int amount, int costGold, Transform parent, string info)
     {
         _nameItem.text = name;
         IdItem = id;
         _costGold = costGold;
         _image.sprite = image;
         _amountText.text = amount.ToString();
-
-        _parentInfoPanel = parent;
+        _infoItem = info;
+       _parentInfoPanel = parent;
     }
 
     public void SetAmmount(int amount)
@@ -99,22 +87,11 @@ public class UI_InventoryCell : MonoBehaviour
 
     private void OnUseItem()
     {
-/*        if (Player.Instance.inventory.UseItem(IdItem) == true)
-        {
-            SetAmmount(1);
-        }*/
-        Player.Instance.inventory.ComandUseItem.Execute(IdItem);
+        Player.Instance.inventory.UseItem(IdItem);
     }
 
     public void OnRemoveItem()
     {
-/*        if (Player.Instance.inventory.RemoveItem(IdItem) == true)
-        {
-            Debug.Log("Выкинул:");
-            Destroy(gameObject);
-        }*/
-
-        Player.Instance.inventory.ComandRemoveItem.Execute(IdItem);
-
+        Player.Instance.inventory.RemoveItem(IdItem);
     }
 }
