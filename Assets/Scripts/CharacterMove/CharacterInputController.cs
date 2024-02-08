@@ -15,13 +15,23 @@ public class CharacterInputController : MonoBehaviour
         _thirdPersonCamera.RotationControl = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") );
 
 
-/*        if (characterMovement.TargetDirectionControl != Vector3.zero)
+        /*        if (characterMovement.TargetDirectionControl != Vector3.zero)
+                {
+                    _thirdPersonCamera.IsRotateTarget = true;
+                }
+                else 
+                {
+                    _thirdPersonCamera.IsRotateTarget = false;
+                }*/
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) == true)
         {
-            _thirdPersonCamera.IsRotateTarget = true;
+            characterMovement.Sprint();
         }
-        else 
+
+        if (Input.GetKeyDown(KeyCode.Space) == true)
         {
-            _thirdPersonCamera.IsRotateTarget = false;
-        }*/
+            characterMovement.Jump();
+        }
     }
 }
