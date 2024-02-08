@@ -361,24 +361,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Assets/AddressableAssetsData
-/Assets/Editor Default Resources/Dialogue System
-/Assets/Gizmos
-/Assets/Settings
-/Assets/Sprite/Item/Herb
 /Assets/TextMesh Pro
-/Assets/ThirdParty
 /Assets/TutorialInfo
-/Assets/New Terrain.asset
-/Assets/OutdoorsScene.unity
-/Assets/Player 1.fbx
-/Assets/Player 1.prefab
 /Assets/Readme.asset
 /Build
 /Library
-/ProjectSettings
 /Temp
-/UserSettings
 /.vsconfig
 /Assembly-CSharp-Editor-firstpass.csproj
 /Assembly-CSharp-Editor.csproj
@@ -395,4 +383,4 @@ FodyWeavers.xsd
 /Unity.RenderPipelines.HighDefinitionConfig.Editor.Tests.csproj
 /VContainer.csproj
 /VContainer.Editor.csproj
-/Assets/Prefabs
+
